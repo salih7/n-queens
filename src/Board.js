@@ -146,21 +146,17 @@
     hasMajorDiagonalConflictAt: function(majorDiagonalColumnIndexAtFirstRow) {
       var matrix = this.rows();
       var limit = ( matrix.length ); // really should be 'n'
-      var checkCol = majorDiagonalColumnIndexAtFirstRow; // Starting Column
+      var checkCol = majorDiagonalColumnIndexAtFirstRow;// Starting Column
       var checkRow = 0; // Starts at top
       var sum = 0;
-      var mirrorSum = 0;
-
-      while ( (checkRow < limit) && (checkCol < limit) ){
-        var mirrorRow = checkCol;
-        var mirrorCol = checkRow
-        sum += matrix[checkRow][checkCol];
-        mirrorSum += matrix[mirrorRow][mirrorCol];
-        
-        if (sum > 1 || mirrorSum > 1){ return true; }
-
-        checkCol++;
+      
+      while(checkRow < limit) {
+        if(checkCol >= 0 && checkCol < limit) {
+          sum += matrix[checkRow][checkCol];
+        }
         checkRow++;
+        checkCol++;
+        if(sum > 1) { return true; }
       }
       //otherwise...
       return false;
@@ -169,7 +165,7 @@
     // test if any major diagonals on this board contain conflicts
     hasAnyMajorDiagonalConflicts: function() {
       var numOfColumns = this.get(0).length;  // should really be based on 'n' but I guess that's not defined in this scope? 
-      for (var i = 0; i < numOfColumns; i++){
+      for (var i = -1 * numOfColumns; i < numOfColumns; i++){
         if (this.hasMajorDiagonalConflictAt(i)){
           return true;
         }
@@ -186,22 +182,18 @@
     hasMinorDiagonalConflictAt: function(minorDiagonalColumnIndexAtFirstRow) {
       var matrix = this.rows();
       var limit = ( matrix.length ); // really should be 'n'
-      var trueLimit = limit-1;
       var checkCol = minorDiagonalColumnIndexAtFirstRow; // Starting Column
       var checkRow = 0; 
       var sum = 0;
-      var mirrorSum = 0;
 
-      while ( (checkRow < limit ) && (checkCol >= 0) ){
-        var mirrorRow = trueLimit - checkCol;
-        var mirrorCol = trueLimit - checkRow;
-        sum += matrix[checkRow][checkCol];
-        mirrorSum += matrix[mirrorRow][mirrorCol];
-        
-        if (sum > 1 || mirrorSum > 1){ return true; }
-
+      
+      while (checkRow < limit) {
+        if(checkCol >= 0 && checkCol < limit) {
+          sum += matrix[checkRow][checkCol];
+        }
         checkCol--;
-        checkRow++;
+        checkRow++;        
+        if (sum > 1){ return true; }        
       }
       //otherwise...
       return false;
@@ -209,7 +201,7 @@
 
     // test if any minor diagonals on this board contain conflicts
     hasAnyMinorDiagonalConflicts: function() {
-      var limit = this.rows().length;  // should really be based on 'n' but I guess that's not defined in this scope? 
+      var limit = this.rows().length * 2 - 1;  // should really be based on 'n' but I guess that's not defined in this scope? 
       for (var i = 0; i < limit; i++){
         if (this.hasMinorDiagonalConflictAt(i)){
           return true;
