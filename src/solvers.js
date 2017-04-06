@@ -20,9 +20,13 @@
 
 window.findNRooksSolution = function(n) {
   var solution = null; //fixme
-  var board = new Board(makeBlankBoard(n));
-  //
+  var matrix = makeBlankBoard(n);
 
+  for (var i = 0; i < n; i++){
+    matrix[i][i] = 1;
+  }
+
+  solution = matrix;
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   return solution;
 };
@@ -34,15 +38,48 @@ window.countNRooksSolutions = function(n) {
     solutionCount *= i;
   }
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
+  
   return solutionCount;
 };
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
-  var solution = undefined; //fixme
+  var solution = [];
+  var validBoards = [];
+  //var invoked = 0;
 
-  console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
-  return solution;
+  if (n !== 0){
+    for (var i = 0; i < n; i++) {
+      var matrix = makeBlankBoard(n);
+      matrix[0][i] = 1;
+      solution = subFunc(1);  
+      if ( solution !== undefined) {
+        break;
+      }
+    } 
+  } else {
+    solution = [];
+  }
+
+    console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
+    return solution;
+
+
+    function subFunc(row) {    
+      if(row >= n) {
+        return matrix;
+      }
+      var solt = undefined;
+      for (var j = 0; j < n; j++) {
+        matrix[row][j] = 1;
+        //if(n === 6) invoked++;
+        if(validate(matrix)) {
+          row++;
+          return solt || subFunc(row);
+        }
+        matrix[row][j] = 0; // 
+      }
+    }
 };
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
@@ -59,4 +96,9 @@ window.makeBlankBoard = function(n) {
     blankArray.push(new Array(n+1).join('0').split('').map(parseFloat));
   }
   return blankArray;
+}
+
+window.validate = function(matrix) { 
+  var board = new Board(matrix);
+  return !board.hasAnyQueensConflicts();
 }
