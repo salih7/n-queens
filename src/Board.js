@@ -115,7 +115,7 @@
         //add the element at colindex to the retVal;
           retVal += row[colIndex];
           return retVal;
-      },0);
+        }, 0);
     },
 
     // test if a specific column on this board contains a conflict
@@ -128,7 +128,7 @@
 
     // test if any columns on this board contain conflicts
     hasAnyColConflicts: function() {
-      var numOfColumns = this.get(0).length;  // should really be based on 'n' but I guess that's not defined in this scope? 
+      var numOfColumns = this.get('n');
       for (var i = 0; i < numOfColumns; i++){
         if (this.hasColConflictAt(i)){
           return true;
@@ -164,7 +164,7 @@
 
     // test if any major diagonals on this board contain conflicts
     hasAnyMajorDiagonalConflicts: function() {
-      var numOfColumns = this.get(0).length;  // should really be based on 'n' but I guess that's not defined in this scope? 
+      var numOfColumns = this.get('n');
       for (var i = -1 * numOfColumns; i < numOfColumns; i++){
         if (this.hasMajorDiagonalConflictAt(i)){
           return true;

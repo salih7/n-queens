@@ -18,25 +18,54 @@
 // hasAnyMajorDiagonalConflicts
 // hasAnyMinorDiagonalConflicts
 
-window.findNRooksSolution = function(n) {
-  var solution = null; //fixme
-  var matrix = makeBlankBoard(n);
-
-  for (var i = 0; i < n; i++){
-    matrix[i][i] = 1;
+window.traverseBoard = function(board, row, n, conflictTest, callback) {
+  if(row === n) {
+    return callback();
   }
 
-  solution = matrix;
+  for(var i = 0; i < n; i++) {  
+    board.togglePiece(row, i);
+    if(row === n - 1 && !board[conflictTest]()) {
+      var result = traverseBoard(board, row + 1, n, conflictTest, callback);
+      if(result) {
+        return result;
+      }
+    } else {
+      if(!board[conflictTest]()) {
+        var result = traverseBoard(board, row + 1, n, conflictTest, callback);
+        if(result) {
+          return result;
+        }
+      } 
+    } 
+    board.togglePiece(row, i);
+  }
+};
+
+window.findNRooksSolution = function(n) {
+  var solution = null;
+  var board = new Board({ n : n });
+
+  solution = traverseBoard(board, 0, n, 'hasAnyRooksConflicts', function() {
+    return _.map(board.rows(), function(row) {
+      return row.slice();
+    });
+  });
+
+  console.log(JSON.stringify(solution));
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   return solution;
 };
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  var solutionCount = 1; //fixme
-  for(var i = 1; i <= n; i++) {
-    solutionCount *= i;
-  }
+  var solutionCount = 0;
+  var board = new Board({ n : n });
+
+  traverseBoard(board, 0, n, 'hasAnyRooksConflicts', function() {
+    solutionCount++;
+  });  
+
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   
   return solutionCount;
@@ -44,61 +73,34 @@ window.countNRooksSolutions = function(n) {
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
-  var solution = [];
-  var validBoards = [];
-  //var invoked = 0;
+  var solution = null;
+  var board = new Board({ n : n });
 
-  if (n !== 0){
-    for (var i = 0; i < n; i++) {
-      var matrix = makeBlankBoard(n);
-      matrix[0][i] = 1;
-      solution = subFunc(1);  
-      if ( solution !== undefined) {
-        break;
-      }
-    } 
-  } else {
-    solution = [];
-  }
+  solution = traverseBoard(board, 0, n, 'hasAnyQueensConflicts', function() {
+    return _.map(board.rows(), function(row) {
+      return row.slice();
+    });
+  });
 
-    console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
-    return solution;
+  solution = solution || board.rows();
 
-
-    function subFunc(row) {    
-      if(row >= n) {
-        return matrix;
-      }
-      var solt = undefined;
-      for (var j = 0; j < n; j++) {
-        matrix[row][j] = 1;
-        //if(n === 6) invoked++;
-        if(validate(matrix)) {
-          row++;
-          return solt || subFunc(row);
-        }
-        matrix[row][j] = 0; // 
-      }
-    }
+  console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
+  return solution;
 };
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
-  var solutionCount = undefined; //fixme
+  if(n === 0) {
+    return 1;
+  }
+
+  var solutionCount = 0;
+  var board = new Board({ n : n }); 
+
+  traverseBoard(board, 0, n, 'hasAnyQueensConflicts', function() {
+    solutionCount++;
+  });
 
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
 };
-
-window.makeBlankBoard = function(n) {
-  var blankArray = [];
-  for (var i = 0; i < n; i++) {
-    blankArray.push(new Array(n+1).join('0').split('').map(parseFloat));
-  }
-  return blankArray;
-}
-
-window.validate = function(matrix) { 
-  var board = new Board(matrix);
-  return !board.hasAnyQueensConflicts();
-}
